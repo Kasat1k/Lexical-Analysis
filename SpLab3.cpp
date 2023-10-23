@@ -4,14 +4,11 @@
 #include <string>
 
 
-
 // Enum для категоризації токенів
 enum TokenType {
     KEYWORD, IDENTIFIER, STRING_CONSTANT, NUMERIC_CONSTANT, HEXADECIMAL_NUMBER,
     DECIMAL_NUMBER, OPERATOR, DELIMITER, PREPROCESSOR_DIRECTIVE, COMMENT, UNKNOWN
 };
-
-
 // Структура токену
 struct Token {
     std::string value;
@@ -33,7 +30,6 @@ void displayTokens(const std::vector<Token>& tokens);
 // Основна функція
 int main() {
     setlocale(LC_ALL, "uk_UA.UTF-8");
-
     std::string code = R"(
         // Це коментар
 import Foundation
@@ -95,6 +91,7 @@ sayHello(name: "Hello")
 }
 
 // Реалізація функцій
+
 bool isKeyword(const std::string& token) {
     // Список зарезервованих слів Swift
     std::vector<std::string> keywords = { "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func", "import", "init", "inout", "internal", "let", "open", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var", "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if", "in", "repeat", "return", "switch", "where", "while"};
@@ -152,6 +149,26 @@ bool isPreprocessorDirective(const std::string& token) {
     // Регулярний вираз для директив препроцесора: #<directive>
     std::regex preprocessor_regex("#[a-z]+");
     return std::regex_match(token, preprocessor_regex);
+}
+
+void displayTokens(const std::vector<Token>& tokens) {
+    for (const Token& token : tokens) {
+        std::cout << "Lexeme: " << token.value << " - Type: ";
+        switch (token.type) {
+        case KEYWORD: std::cout << "Keyword"; break;
+        case IDENTIFIER: std::cout << "Identifier"; break;
+        case STRING_CONSTANT: std::cout << "String Constant"; break;
+        case NUMERIC_CONSTANT: std::cout << "Numeric Constant"; break;
+        case HEXADECIMAL_NUMBER: std::cout << "Hexadecimal Number"; break;
+        case DECIMAL_NUMBER: std::cout << "Decimal Number"; break;
+        case OPERATOR: std::cout << "Operator"; break;
+        case DELIMITER: std::cout << "Delimiter"; break;
+        case PREPROCESSOR_DIRECTIVE: std::cout << "Preprocessor Directive"; break;
+        case COMMENT: std::cout << "Comment"; break;
+        case UNKNOWN: std::cout << "Unknown"; break;
+        }
+        std::cout << std::endl;
+    }
 }
 
 std::vector<Token> tokenize(const std::string& code) {
@@ -302,22 +319,3 @@ void analyze(const std::vector<Token>& tokens) {
     std::cout << "Unknown: " << unknownCount << std::endl;
 }
 
-void displayTokens(const std::vector<Token>& tokens) {
-    for (const Token& token : tokens) {
-        std::cout << "Lexeme: " << token.value << " - Type: ";
-        switch (token.type) {
-        case KEYWORD: std::cout << "Keyword"; break;
-        case IDENTIFIER: std::cout << "Identifier"; break;
-        case STRING_CONSTANT: std::cout << "String Constant"; break;
-        case NUMERIC_CONSTANT: std::cout << "Numeric Constant"; break;
-        case HEXADECIMAL_NUMBER: std::cout << "Hexadecimal Number"; break;
-        case DECIMAL_NUMBER: std::cout << "Decimal Number"; break;
-        case OPERATOR: std::cout << "Operator"; break;
-        case DELIMITER: std::cout << "Delimiter"; break;
-        case PREPROCESSOR_DIRECTIVE: std::cout << "Preprocessor Directive"; break;
-        case COMMENT: std::cout << "Comment"; break;
-        case UNKNOWN: std::cout << "Unknown"; break;
-        }
-        std::cout << std::endl;
-    }
-}
