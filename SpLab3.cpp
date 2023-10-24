@@ -2,35 +2,36 @@
 #include <vector>
 #include <regex>
 #include <string>
+using namespace std;
 
 
-// Enum для категоризації токенів
-enum TokenType {
-    KEYWORD, IDENTIFIER, STRING_CONSTANT, NUMERIC_CONSTANT, HEXADECIMAL_NUMBER,
+// Enum для категоризації лексем
+enum LexemeType {
+    RESERVEDWORD, IDENTIFIER, STRING_CONSTANT, NUMERIC_CONSTANT, HEXADECIMAL_NUMBER,
     DECIMAL_NUMBER, OPERATOR, DELIMITER, PREPROCESSOR_DIRECTIVE, COMMENT, UNKNOWN
 };
-// Структура токену
-struct Token {
-    std::string value;
-    TokenType type;
+// Структура лексеми
+struct Lexeme {
+    string value;
+    LexemeType type;
 };
 
 // Оголошення функцій
-bool isKeyword(const std::string& token);
-bool isIdentifier(const std::string& token);
-bool isStringConstant(const std::string& token);
-bool isNumericConstant(const std::string& token);
-bool isOperator(const std::string& token);
-bool isDelimiter(const std::string& token);
-bool isPreprocessorDirective(const std::string& token);
-std::vector<Token> tokenize(const std::string& code);
-void analyze(const std::vector<Token>& tokens);
-void displayTokens(const std::vector<Token>& tokens);
+bool isReservedWord(const string& lexeme);
+bool isIdentifier(const string& lexeme);
+bool isStringConstant(const string& lexeme);
+bool isNumericConstant(const string& lexeme);
+bool isOperator(const string& lexeme);
+bool isDelimiter(const string& lexeme);
+bool isPreprocessorDirective(const string& lexeme);
+vector<Lexeme> lexemeSize(const string& code);
+void analyze(const vector<Lexeme>& lexemes);
+void display(const vector<Lexeme>& lexemes);
 
 // Основна функція
 int main() {
     setlocale(LC_ALL, "uk_UA.UTF-8");
-    std::string code = R"(
+    string code = R"(
         // Це коментар
 import Foundation
 
@@ -84,96 +85,96 @@ sayHello(name: "Hello")
 
 // Кінець програми
   )";
-    std::vector<Token> tokens = tokenize(code);
-    analyze(tokens);
-    displayTokens(tokens);
+    vector<Lexeme> lexemes = lexemeSize(code);
+    analyze(lexemes);
+    display(lexemes);
     return 0;
 }
 
 // Реалізація функцій
 
-bool isKeyword(const std::string& token) {
+bool isReservedWord(const string& Lexeme) {
     // Список зарезервованих слів Swift
-    std::vector<std::string> keywords = { "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func", "import", "init", "inout", "internal", "let", "open", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var", "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if", "in", "repeat", "return", "switch", "where", "while"};
+    vector<string> reservedwords = { "associatedtype", "class", "deinit", "enum", "extension", "fileprivate", "func", "import", "init", "inout", "internal", "let", "open", "operator", "private", "protocol", "public", "static", "struct", "subscript", "typealias", "var", "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for", "guard", "if", "in", "repeat", "return", "switch", "where", "while"};
 
-    return std::find(keywords.begin(), keywords.end(), token) != keywords.end();
+    return find(reservedwords.begin(), reservedwords.end(), Lexeme) != reservedwords.end();
 }
 
-bool isIdentifier(const std::string& token) {
+bool isIdentifier(const string& lexeme) {
     // Регулярний вираз для ідентифікаторів Swift: [_a-zA-Z][_a-zA-Z0-9]*
-    std::regex identifier_regex("[_a-zA-Z][_a-zA-Z0-9]*");
-    return std::regex_match(token, identifier_regex);
+    regex identifier_regex("[_a-zA-Z][_a-zA-Z0-9]*");
+    return regex_match(lexeme, identifier_regex);
 }
 
-bool isStringConstant(const std::string& token) {
+bool isStringConstant(const string& lexeme) {
     // Регулярний вираз для рядкової константи: "([^"\]|\.)*"
-    std::regex string_regex("\"([^\"\\\\]|\\\\.)*\"");
-    return std::regex_match(token, string_regex);
+    regex string_regex("\"([^\"\\\\]|\\\\.)*\"");
+    return regex_match(lexeme, string_regex);
 }
 
-bool isHexadecimalNumber(const std::string& token) {
+bool isHexadecimalNumber(const string& lexeme) {
     // Регулярний вираз для шістнадцяткових чисел 
-    std::regex hexPattern("^0[xX][0-9a-fA-F]+$");
-    return std::regex_match(token, hexPattern);
+    regex hexPattern("^0[xX][0-9a-fA-F]+$");
+    return regex_match(lexeme, hexPattern);
 }
 
-bool isDecimalNumber(const std::string& token) {
+bool isDecimalNumber(const string& lexeme) {
     // Регулярний вираз для десяткових чисел
-    std::regex decimalPattern("^\\d*\\.\\d+|\\d+\\.$");
-    return std::regex_match(token, decimalPattern);
+    regex decimalPattern("^\\d*\\.\\d+|\\d+\\.$");
+    return regex_match(lexeme, decimalPattern);
 }
 
-bool isNumericConstant(const std::string& token) {
+bool isNumericConstant(const string& lexeme) {
     // Регулярний вираз для числової константи
-    std::regex numeric_regex("([0-9]*\\.[0-9]+|[0-9]+)");
-    return std::regex_match(token, numeric_regex);
+    regex numeric_regex("([0-9]*\\.[0-9]+|[0-9]+)");
+    return regex_match(lexeme, numeric_regex);
 }
 
-bool isOperator(const std::string& token) {
+bool isOperator(const string& lexeme) {
 
     // Список операторів мови Swift
-    std::vector<std::string> operators = { "+", "-", "*", "/", "%", "&", "|", "^", "!", "~", "++", "--", "<<", ">>", "==", "!=", ">", "<", ">=", "<=", "&&", "||", "??", "?:", "=>", "=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=", "[]", "()", ".", "->" };
+    vector<string> operators = { "+", "-", "*", "/", "%", "&", "|", "^", "!", "~", "++", "--", "<<", ">>", "==", "!=", ">", "<", ">=", "<=", "&&", "||", "??", "?:", "=>", "=", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=", "[]", "()", ".", "->" };
 
-    return std::find(operators.begin(), operators.end(), token) != operators.end();
+    return find(operators.begin(), operators.end(), lexeme) != operators.end();
 }
 
-bool isDelimiter(const std::string& token) {
+bool isDelimiter(const string& lexeme) {
 
     // Список розділових знаків мови Swift
-    std::vector<std::string> delimiters = { ",", ";", "{", "}", "(", ")", "[", "]", ":", "?" };
+    vector<string> delimiters = { ",", ";", "{", "}", "(", ")", "[", "]", ":", "?" };
 
-    return std::find(delimiters.begin(), delimiters.end(), token) != delimiters.end();
+    return find(delimiters.begin(), delimiters.end(), lexeme) != delimiters.end();
 }
 
-bool isPreprocessorDirective(const std::string& token) {
+bool isPreprocessorDirective(const string& lexeme) {
     // Регулярний вираз для директив препроцесора: #<directive>
-    std::regex preprocessor_regex("#[a-z]+");
-    return std::regex_match(token, preprocessor_regex);
+    regex preprocessor_regex("#[a-z]+");
+    return regex_match(lexeme, preprocessor_regex);
 }
 
-void displayTokens(const std::vector<Token>& tokens) {
-    for (const Token& token : tokens) {
-        std::cout << "Lexeme: " << token.value << " - Type: ";
-        switch (token.type) {
-        case KEYWORD: std::cout << "Keyword"; break;
-        case IDENTIFIER: std::cout << "Identifier"; break;
-        case STRING_CONSTANT: std::cout << "String Constant"; break;
-        case NUMERIC_CONSTANT: std::cout << "Numeric Constant"; break;
-        case HEXADECIMAL_NUMBER: std::cout << "Hexadecimal Number"; break;
-        case DECIMAL_NUMBER: std::cout << "Decimal Number"; break;
-        case OPERATOR: std::cout << "Operator"; break;
-        case DELIMITER: std::cout << "Delimiter"; break;
-        case PREPROCESSOR_DIRECTIVE: std::cout << "Preprocessor Directive"; break;
-        case COMMENT: std::cout << "Comment"; break;
-        case UNKNOWN: std::cout << "Unknown"; break;
+void display(const vector<Lexeme>& lexemes) {
+    for (const Lexeme& lexeme : lexemes) {
+        cout << "Lexeme: " << lexeme.value << " - Type: ";
+        switch (lexeme.type) {
+        case RESERVEDWORD: cout << "Reservedword"; break;
+        case IDENTIFIER: cout << "Identifier"; break;
+        case STRING_CONSTANT: cout << "String Constant"; break;
+        case NUMERIC_CONSTANT: cout << "Numeric Constant"; break;
+        case HEXADECIMAL_NUMBER: cout << "Hexadecimal Number"; break;
+        case DECIMAL_NUMBER: cout << "Decimal Number"; break;
+        case OPERATOR: cout << "Operator"; break;
+        case DELIMITER: cout << "Delimiter"; break;
+        case PREPROCESSOR_DIRECTIVE: cout << "Preprocessor Directive"; break;
+        case COMMENT: cout << "Comment"; break;
+        case UNKNOWN: cout << "Unknown"; break;
         }
-        std::cout << std::endl;
+        cout << endl;
     }
 }
 
-std::vector<Token> tokenize(const std::string& code) {
-    std::vector<Token> tokens;
-    std::string token;
+ vector<Lexeme> lexemeSize(const string& code) {
+    vector<Lexeme> lexemes;
+    string lexeme;
     bool isString = false;
     bool isSingleLineComment = false;
     bool isMultiLineComment = false;
@@ -190,26 +191,26 @@ std::vector<Token> tokenize(const std::string& code) {
         }
         // Обробка директив препроцесора
         if (c == '#' && !isString && !isSingleLineComment && !isMultiLineComment) {
-            token += c;
-            while (i + 1 < code.length() && !std::isspace(code[i + 1])) {
-                token += code[++i];
+            lexeme += c;
+            while (i + 1 < code.length() && !isspace(code[i + 1])) {
+                lexeme += code[++i];
             }
-            tokens.push_back({ token, PREPROCESSOR_DIRECTIVE });
-            token.clear();
+            lexemes.push_back({ lexeme, PREPROCESSOR_DIRECTIVE });
+            lexeme.clear();
             continue;
         }
 
         // Обробка закінчення коментарів
         if (isSingleLineComment && c == '\n') {
             isSingleLineComment = false;
-            tokens.push_back({ token, COMMENT });
-            token.clear();
+            lexemes.push_back({ lexeme, COMMENT });
+            lexeme.clear();
         }
         if (isMultiLineComment && c == '*' && i + 1 < code.length() && code[i + 1] == '/') {
             isMultiLineComment = false;
-            token += "*/";
-            tokens.push_back({ token, COMMENT });
-            token.clear();
+            lexeme += "*/";
+            lexemes.push_back({ lexeme, COMMENT });
+            lexeme.clear();
             ++i;  
             continue;
         }
@@ -217,57 +218,57 @@ std::vector<Token> tokenize(const std::string& code) {
 
         // Збір символів всередині коментарів
         if (isSingleLineComment || isMultiLineComment) {
-            token += c;
+            lexeme += c;
             continue;
         }
 
         // Обробка рядків
         if (c == '\"') {
             if (isString) {
-                token += c;
-                tokens.push_back({ token, STRING_CONSTANT });
-                token.clear();
+                lexeme += c;
+                lexemes.push_back({ lexeme, STRING_CONSTANT });
+                lexeme.clear();
             }
             else {
-                if (!token.empty()) {
-                    tokens.push_back({ token, UNKNOWN });  // Додати попередній токен як "UNKNOWN"
-                    token.clear();
+                if (!lexeme.empty()) {
+                    lexemes.push_back({ lexeme, UNKNOWN });  // Додати попередню лексему як "UNKNOWN"
+                    lexeme.clear();
                 }
             }
             isString = !isString;
         }
         else if (isString) {
-            token += c;
+            lexeme += c;
         }
 
-        // Обробка інших токенів
-        else if (std::isspace(c)) {
-            if (!token.empty()) {
-                tokens.push_back({ token, UNKNOWN });  // Додати попередній токен як "UNKNOWN" 
-                token.clear();
+        // Обробка інших лексем
+        else if (isspace(c)) {
+            if (!lexeme.empty()) {
+                lexemes.push_back({ lexeme, UNKNOWN });  // Додати попередню лексему як "UNKNOWN"
+                lexeme.clear();
             }
         }
-        else if (std::ispunct(c)) {
-            if (!token.empty()) {
-                tokens.push_back({ token, UNKNOWN });  // Додати попередній токен як "UNKNOWN" 
-                token.clear();
+        else if (ispunct(c)) {
+            if (!lexeme.empty()) {
+                lexemes.push_back({ lexeme, UNKNOWN });  // Додати попередню лексему як "UNKNOWN"
+                lexeme.clear();
             }
-            tokens.push_back({ std::string(1, c), UNKNOWN });  // Додати попередній токен як "UNKNOWN" 
+            lexemes.push_back({ string(1, c), UNKNOWN });  // Додати попередню лексему як "UNKNOWN"
         }
         else {
-            token += c;
+            lexeme += c;
         }
     }
 
-    // Перевірка наявності будь-якого залишкового токену
-    if (!token.empty()) {
-        tokens.push_back({ token, UNKNOWN });  // Додати попередній токен як "UNKNOWN" 
+    // Перевірка наявності будь-якої залишкової лексеми
+    if (!lexeme.empty()) {
+        lexemes.push_back({ lexeme, UNKNOWN });  // Додати попередню лексему як "UNKNOWN"
     }
 
 
-    // Розбиття на категорії токенів
-    for (Token& t : tokens) {
-        if (isKeyword(t.value)) t.type = KEYWORD;
+    // Розбиття на категорії лексем
+    for (Lexeme& t : lexemes) {
+        if (isReservedWord(t.value)) t.type = RESERVEDWORD;
         else if (isIdentifier(t.value)) t.type = IDENTIFIER;
         else if (isHexadecimalNumber(t.value)) t.type = HEXADECIMAL_NUMBER;
         else if (isDecimalNumber(t.value)) t.type = DECIMAL_NUMBER;
@@ -278,13 +279,13 @@ std::vector<Token> tokenize(const std::string& code) {
         
     }
 
-    return tokens;
+    return lexemes;
 }
 
 
 
-void analyze(const std::vector<Token>& tokens) {
-    int keywordCount = 0;
+void analyze(const vector<Lexeme>& lexemes) {
+    int reservedwordCount = 0;
     int identifierCount = 0;
     int stringConstantCount = 0;
     int numericConstantCount = 0;
@@ -293,10 +294,10 @@ void analyze(const std::vector<Token>& tokens) {
     int preprocessorDirectiveCount = 0;
     int unknownCount = 0;
 
-    // Підрахунок кількості токенів кожного типу
-    for (const Token& token : tokens) {
-        switch (token.type) {
-        case KEYWORD: ++keywordCount; break;
+    // Підрахунок кількості лексем кожного типу
+    for (const Lexeme& lexeme : lexemes) {
+        switch (lexeme.type) {
+        case RESERVEDWORD: ++reservedwordCount; break;
         case IDENTIFIER: ++identifierCount; break;
         case STRING_CONSTANT: ++stringConstantCount; break;
         case NUMERIC_CONSTANT: ++numericConstantCount; break;
@@ -308,14 +309,14 @@ void analyze(const std::vector<Token>& tokens) {
     }
 
     // Вивід
-    std::cout << "Analysis Results:" << std::endl;
-    std::cout << "Keywords: " << keywordCount << std::endl;
-    std::cout << "Identifiers: " << identifierCount << std::endl;
-    std::cout << "String Constants: " << stringConstantCount << std::endl;
-    std::cout << "Numeric Constants: " << numericConstantCount << std::endl;
-    std::cout << "Operators: " << operatorCount << std::endl;
-    std::cout << "Delimiters: " << delimiterCount << std::endl;
-    std::cout << "Preprocessor Directives: " << preprocessorDirectiveCount << std::endl;
-    std::cout << "Unknown: " << unknownCount << std::endl;
+    cout << "Analysis Results:" << endl;
+    cout << "Reservedwords: " << reservedwordCount << endl;
+    cout << "Identifiers: " << identifierCount << endl;
+    cout << "String Constants: " << stringConstantCount << endl;
+    cout << "Numeric Constants: " << numericConstantCount << endl;
+    cout << "Operators: " << operatorCount << endl;
+    cout << "Delimiters: " << delimiterCount << endl;
+    cout << "Preprocessor Directives: " << preprocessorDirectiveCount << endl;
+    cout << "Unknown: " << unknownCount << endl;
 }
 
